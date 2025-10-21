@@ -1,10 +1,12 @@
 #!/bin/bash
 set -e
 
-echo "🔐 Configuring Git credentials for private submodule..."
-git config --global url."https://x-access-token:${GH_PAT}@github.com/".insteadOf "https://github.com/"
+echo "🔐 Setting up authentication..."
 
-echo "📦 Initializing submodules..."
+# Remplacer l'URL du submodule par une version avec token
+git config submodule.content.url "https://x-access-token:${GH_PAT}@github.com/SoDimicom/MyQuartzNotes.git"
+
+echo "📦 Cloning submodule..."
 git submodule sync
 git submodule update --init --recursive
 
