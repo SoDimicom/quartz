@@ -13,19 +13,16 @@ jobs:
       - name: 📥 Checkout quartz
         uses: actions/checkout@v4
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          submodules: true
+          token: ${{ secrets.PAT_TOKEN }}  # ← Changé ici !
+          submodules: recursive
       
       - name: 🔄 Update submodule to latest
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           
-          cd content
-          git checkout main
-          git pull origin main
+          git submodule update --remote --merge
           
-          cd ..
           git add content
-          git commit -m "📝 Auto-update content submodule to latest" || echo "No changes"
+          git diff --staged --quiet || git commit -m "📝 Auto-update content submodule"
           git push
