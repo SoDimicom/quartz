@@ -1,5 +1,5 @@
 {
   "buildCommand": "npx quartz build",
-  "outputDirectory": "public",
+  "outputDirectory": "./",
   "cleanUrls": true
 }
