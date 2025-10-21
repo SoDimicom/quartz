@@ -1,0 +1,31 @@
+name: 📝 Update Content Submodule
+
+on:
+  repository_dispatch:
+    types: [update-content]
+  workflow_dispatch:
+
+jobs:
+  update-submodule:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📥 Checkout quartz
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          submodules: true
+      
+      - name: 🔄 Update submodule to latest
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          
+          cd content
+          git checkout main
+          git pull origin main
+          
+          cd ..
+          git add content
+          git commit -m "📝 Auto-update content submodule to latest" || echo "No changes"
+          git push
