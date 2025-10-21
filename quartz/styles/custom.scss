@@ -1,7 +1,3 @@
-@use "./base.scss";
-
-// put your custom CSS here!
-
 @use "sass:map";
 @use "./base.scss";
 @use "./variables.scss" as *;
@@ -276,5 +272,4 @@ li {
   direction: ltr !important;
   text-align: left !important;
 }
-
 
