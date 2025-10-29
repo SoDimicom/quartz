@@ -13,6 +13,7 @@ jobs:
       - name: 📥 Checkout quartz
         uses: actions/checkout@v4
         with:
+          ref: notes
           token: ${{ secrets.PAT_TOKEN }}
           submodules: false
       
@@ -38,4 +39,4 @@ jobs:
           # Commit et push les changements
           git add content
           git commit -m "📝 Auto-update content submodule to latest"
-          git push origin v4
+          git push origin notes
