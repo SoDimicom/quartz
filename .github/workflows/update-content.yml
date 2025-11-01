@@ -10,10 +10,25 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
+      - name: 🔍 Determine target branch
+        id: branch
+        run: |
+          # Extract branch name from the ref sent by MyQuartzNotes
+          REF="${{ github.event.client_payload.ref }}"
+          if [ -z "$REF" ]; then
+            # Fallback to notes if no ref provided (manual trigger)
+            BRANCH="notes"
+          else
+            # Extract branch name from refs/heads/BRANCH
+            BRANCH="${REF#refs/heads/}"
+          fi
+          echo "branch=$BRANCH" >> $GITHUB_OUTPUT
+          echo "Target branch: $BRANCH"
+      
       - name: 📥 Checkout quartz
         uses: actions/checkout@v4
         with:
-          ref: notes
+          ref: ${{ steps.branch.outputs.branch }}
           token: ${{ secrets.PAT_TOKEN }}
           submodules: false
       
@@ -39,4 +54,4 @@ jobs:
           # Commit et push les changements
           git add content
           git commit -m "📝 Auto-update content submodule to latest"
-          git push origin notes
+          git push origin ${{ steps.branch.outputs.branch }}
