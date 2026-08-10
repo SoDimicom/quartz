@@ -16,8 +16,13 @@ configuration:
     fontOrigin: googleFonts
     cdnCaching: true
     typography:
-      header: Carena
-      body: Amiri Quran Colored
+      # Header/body sur une police système : Quartz posera
+      # --headerFont/--bodyFont mais custom.scss les écrase avec les
+      # vrais @font-face (Carena + Amiri Quran Colored, unicode-range).
+      # Ne PAS remettre "Carena" ou "Amiri Quran Colored" ici : elles
+      # n'existent pas sur Google Fonts, Quartz échouerait à les charger.
+      header: system-ui
+      body: system-ui
       code: IBM Plex Mono
     colors:
       lightMode:
