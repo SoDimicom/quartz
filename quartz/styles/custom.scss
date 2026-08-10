@@ -4,6 +4,15 @@
   
 // put your custom CSS here!
 
+article p,
+article li,
+article h1, article h2, article h3,
+article h4, article h5, article h6,
+article blockquote,
+article td, article th {
+  unicode-bidi: plaintext;
+  text-align: start;
+}
 
 /* Carena - pour latin (titres) */
 @font-face {
