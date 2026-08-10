@@ -46,7 +46,8 @@ body {
   font-family: $font-body;
 }
 
-h1, h2, h3, h4, h5, h6 {
+// Carena réservée aux h2/h3 — h1, h4-h6 restent sur la pile par défaut
+h2, h3 {
   font-family: $font-header;
 }
 
