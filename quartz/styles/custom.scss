@@ -46,9 +46,27 @@ body {
   font-family: $font-body;
 }
 
-// Carena réservée aux h2/h3 — h1, h4-h6 restent sur la pile par défaut
-h2, h3 {
-  font-family: $font-header;
+// Carena réservée aux h2/h3. base.scss pose déjà
+// `h1,h2,h3,h4,h5,h6 { font-family: var(--headerFont) }` — même
+// spécificité (0,0,1), donc c'est l'ordre de @use qui départage :
+// `@use "./base.scss"` est chargé avant ces règles, on gagne au
+// cascade normal. Le article > & ci-dessous verrouille quand même
+// avec une spécificité supérieure, au cas où un thème/plugin
+// réinjecte la règle de base plus tard dans la feuille compilée.
+article h2,
+article h3,
+h2,
+h3 {
+  font-family: $font-header !important;
+}
+
+// h1, h4-h6 : explicitement sur --headerFont (system-ui, cf.
+// quartz.config.yaml) plutôt que de laisser une valeur ambiguë.
+h1,
+h4,
+h5,
+h6 {
+  font-family: var(--headerFont);
 }
 
 code {
