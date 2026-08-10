@@ -1,8 +1,62 @@
 @use "sass:map";
 @use "./base.scss";
 @use "./variables.scss" as *;
-  
-// put your custom CSS here!
+
+// ═══════════════════════════════════════════════════════════════
+//  FUSION
+//  · Ton système de polices, ton échelle de titres Flexoki et tes
+//    featured cards : conservés à l'identique.
+//  · Couche visuelle reprise de blog.eledah.ir (MIT) : fond texturé,
+//    contenu en carte, verre dépoli, barres latérales collantes.
+//  · Restes RTL persans de ton fichier : supprimés (voir notes en bas).
+// ═══════════════════════════════════════════════════════════════
+
+$mobileBreakpoint: map.get($breakpoints, mobile);
+$desktopBreakpoint: map.get($breakpoints, desktop);
+$fullPageWidth: $desktopBreakpoint;
+
+// ═══ A. TES POLICES — inchangées ═══════════════════════════════
+// `unicode-range` répartit la charge par plage Unicode : le navigateur
+// ne télécharge Amiri que s'il rencontre effectivement de l'arabe.
+
+/* Carena — latin (titres) */
+@font-face {
+  font-family: "Carena";
+  src: url("https://fonts.cdnfonts.com/s/85090/Carena-Regular.woff") format("woff");
+  unicode-range: U+0000-00FF;
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Amiri Quran Colored — arabe */
+@font-face {
+  font-family: "Amiri Quran Colored";
+  src: url("https://fonts.cdnfonts.com/s/93185/AmiriQuranColored-Regular.woff") format("woff");
+  unicode-range: U+0600-06FF, U+0750-077F, U+08A0-08FF, U+FB50-FDFF, U+FE70-FEFF;
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+$font-body: "Amiri Quran Colored", "Noto Serif", serif;
+$font-header: "Carena", "Amiri Quran Colored", serif;
+
+body {
+  font-family: $font-body;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: $font-header;
+}
+
+code {
+  direction: ltr !important;
+  font-family: "IBM Plex Mono", "Fira Code", monospace;
+  font-size: 0.9em;
+}
+
+// ═══ B. DIRECTION AUTOMATIQUE DU TEXTE ═════════════════════════
 
 article p,
 article li,
@@ -14,186 +68,283 @@ article td, article th {
   text-align: start;
 }
 
-/* Carena - pour latin (titres) */
-@font-face {
-  font-family: 'Carena';
-  src: url('https://fonts.cdnfonts.com/s/85090/Carena-Regular.woff') format('woff');
-  unicode-range: U+0000-00FF; /* Basic Latin */
-  font-weight: normal;
-  font-style: normal;
+p {
+  line-height: 2;
+  margin-bottom: 1.2em;
 }
 
-/* Amiri Quran Colored - pour arabe */
-@font-face {
-  font-family: 'Amiri Quran Colored';
-  src: url('https://fonts.cdnfonts.com/s/93185/AmiriQuranColored-Regular.woff') format('woff');
-  unicode-range: U+0600-06FF, U+0750-077F, U+08A0-08FF, U+FB50-FDFF, U+FE70-FEFF; /* Arabic blocks */
-  font-weight: normal;
-  font-style: normal;
+// Citation coranique ou hadith mis en avant
+.ayah {
+  font-family: "Amiri Quran Colored", "Amiri", serif;
+  font-size: 1.375rem;
+  line-height: 2.5em;
+  direction: rtl;
+  text-align: right;
 }
 
-/* Variables */
-$font-body: 'Amiri Quran Colored', 'Noto Serif', serif; // Arabe -> Amiri, Latin -> Calibri
-$font-header: 'Carena', 'Amiri Quran Colored', serif; // Titres latin -> Carena, arabe -> Amiri
+.ayah-translation {
+  color: var(--gray);
+  font-size: 0.95rem;
+}
 
-/* Application */
+// ═══ C. FOND TEXTURÉ ═══════════════════════════════════════════
+// Bruit fractal en SVG inline, aucun fichier à héberger.
+// `absolute` et non `fixed` : en fixed la texture se colle au viewport
+// et le contenu glisse dessous au scroll sur mobile.
+
+$noise-texture: url("data:image/svg+xml,%3Csvg viewBox='0 0 250 250' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+
 body {
-  font-family: $font-body;
+  background-color: #f9f7f2;
+  min-height: 100vh;
+  position: relative;
+  width: 100%;
+  max-width: 100%;
+}
+
+body::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  min-height: 100%;
+  background-image: $noise-texture;
+  background-repeat: repeat;
+  opacity: 0.04;
+  pointer-events: none;
+  z-index: -1;
+}
+
+[saved-theme="dark"] body {
+  background-color: var(--light);
+}
+
+// ═══ D. CORRECTIFS DE DÉBORDEMENT ══════════════════════════════
+// base.scss pose html { width: 100vw }, qui inclut la scrollbar et
+// déborde sur mobile ; et overflow:hidden sur html/body neutralise
+// position:sticky sur les barres latérales.
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: clip;
+}
+
+// ═══ E. CONTENU EN CARTE ═══════════════════════════════════════
+
+.center {
+  background-color: #ffffff;
+  border-radius: 24px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  padding: 32px !important;
+  margin-top: 2rem !important;
+  width: 100%;
+  max-width: 100%;
+}
+
+[saved-theme="dark"] .center {
+  background-color: var(--lightgray);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+@media (max-width: $mobileBreakpoint) {
+  html, body {
+    overflow-x: clip;
+  }
+
+  .page {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  .page > #quartz-body {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+  }
+
+  .page > #quartz-body .center,
+  .page > #quartz-body footer {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .center {
+    padding: 20px !important;
+    border-radius: 16px;
+    margin-top: 1rem !important;
+  }
+}
+
+// ═══ F. TON ÉCHELLE DE TITRES (Flexoki) — inchangée ════════════
+
+$red: #af3029;
+$orange: #bc5215;
+$yellow: #ad8301;
+$green: #66800b;
+$cyan: #24837b;
+$blue: #205ea6;
+$purple: #5e409d;
+$magenta: #a02f6f;
+
+.page article {
+  > h1 {
+    border-bottom: 1px solid var(--lightgray);
+    padding-bottom: 0.3em;
+    font-size: 36px !important;
+    color: $red;
+  }
+
+  > h2 { font-size: 30px !important; color: $orange; }
+  > h3 { font-size: 24px !important; color: $yellow; }
+  > h4 { font-size: 20px !important; color: $green; }
+  > h5 { font-size: 18px !important; color: $cyan; }
+  > h6 { font-size: 16px !important; color: $purple; }
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: $font-header;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
 }
 
-.breadcrumb-element p {
-  margin: 0 .5rem 0 0;
-  padding: 0;
-  line-height: normal;
-}
- 
-button#explorer .fold {
-  opacity: .8;
-  margin-left: 0 !important;
-  margin-right: 0.5rem !important;
-  transition: transform .3s;
-}
- 
-.content-meta[show-comma="true"] > span:not(:last-child) {
-  margin-left: 8px !important;
-  margin-right: 0px !important;
-}
- 
-.tags {
-  padding-left: 0px !important;
-  padding-right: 0px !important;
-}
- 
-.folder-icon {
-  margin-right: 0px !important;
-  margin-left: 5px !important;
-}
- 
-#explorer-content ul {
-  padding-right: .7rem !important;
-  padding-left: 0px !important;
-}
- 
-#toc-content .depth-1 {
-  padding: 0px !important;
-  padding-right: 1rem !important;
-}
- 
-#toc-content .depth-2 {
-  padding: 0px !important;
-  padding-right: 2rem !important;
-}
- 
-#toc-content .depth-3 {
-  padding: 0px !important;
-  padding-right: 3rem !important;
-}
- 
-li:has(> .folder-outer:not(.open)) > .folder-container > svg {
-  transform: rotate(90deg) !important;
-}
- 
-div.search.mobile-only {
-    padding-right: 10px !important;
-}
- 
-code { 
-	direction: ltr !important;
+// Les appels de note gonflent la hauteur de ligne du paragraphe
+sup {
+  line-height: 0;
+  vertical-align: super;
+  font-size: 0.75em;
+  margin-inline-start: 2px;
+
+  a[data-footnote-ref] {
+    line-height: 0;
+    vertical-align: baseline;
+  }
 }
 
-h2#footnote-label{
-  visibility: hidden;
-}
- 
-h2#footnote-label::after{
-  content: "پانوشت‌ها";
-  visibility: visible;
-  display: block;
+// ═══ G. LIENS ══════════════════════════════════════════════════
+// inset-inline-start plutôt que left : le trait part du bon côté
+// que le bloc soit rendu en LTR ou en RTL.
+
+a {
+  position: relative;
+  transition: color 0.3s ease;
 }
 
-blockquote {
-  border-right: 3px solid var(--secondary);
-  border-left: none;
+a::after {
+  content: "";
+  position: absolute;
+  bottom: -2px;
+  inset-inline-start: 0;
+  width: 0;
+  height: 2px;
+  background: var(--secondary);
+  transition: width 0.3s ease;
+}
+
+a:hover::after {
+  width: 100%;
+}
+
+a.internal {
+  background-color: transparent !important;
+  padding: 0 !important;
+  color: var(--secondary);
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+a.internal::after {
+  height: 3px;
+  background: var(--tertiary);
+  border-radius: 2px;
+}
+
+a.internal:hover {
+  color: var(--tertiary);
+}
+
+// Les cartes ne doivent pas hériter du soulignement animé
+.card-container::after {
+  content: none !important;
+}
+
+.text-highlight {
+  font-weight: normal;
+  background-color: transparent;
+  padding: 1px 5px;
+  border-radius: 5px;
+  background-position: 0 100%;
+  background-repeat: no-repeat;
+  background-size: 100% 3px;
+  background-image: linear-gradient(120deg, var(--secondary), var(--secondary));
+  transition: background 200ms ease;
+}
+
+.text-highlight:hover {
+  background-size: 100% 100%;
+}
+
+// ═══ H. CITATIONS ══════════════════════════════════════════════
+// border-inline-start : la barre se met à droite si le bloc est arabe,
+// à gauche sinon. Ton ancienne règle border-right la mettait toujours
+// à droite, y compris sur les citations françaises.
+
+blockquote:not(.callout) {
+  position: relative;
   margin: 1rem 0;
-  padding-right: 1rem;
-  padding-left: none;
-  transition: border-color .2s;
+  padding-inline: 1rem 0;
+  border: none;
+  border-inline-start: 3px solid var(--secondary);
+  transition: border-color 0.2s;
 }
 
-/* Tous les paragraphes, quelle que soit la direction */
-p {
-  line-height: 2 !important; /* interlignage confortable, ajuste entre 1.8 et 2.2 */
+blockquote footer {
+  display: block;
+  margin-top: 0.75em;
+  font-size: 0.85rem;
+  font-style: normal;
+  color: var(--darkgray);
+
+  &::before {
+    content: "— ";
+  }
 }
 
-/* Texte arabe dans les paragraphes (direction RTL) */
-p[dir="rtl"] {
-  font-family: 'Amiri Quran Colored', 'Scheherazade', serif !important;
-  direction: rtl !important;
-  text-align: right; /* alignement à droite */
+blockquote.callout {
+  width: auto;
+  max-width: 100%;
+  margin: 1rem 0;
+  padding: 0 1rem;
+  border-radius: 5px;
 }
 
-/* Texte LTR dans les paragraphes */
-p[dir="ltr"], div {
-  direction: ltr !important;
-  text-align: left;
-  font-family: inherit; /* conserve la police par défaut pour le latin */
-  line-height: 1.5 !important; /* plus compact pour le latin */
+.callout.is-collapsed > .callout-title > .fold-callout-icon {
+  transform: rotate(90deg);
 }
 
-// Define the missing variable or use an existing one
-$fullPageWidth: map.get($breakpoints, desktop);
+// ═══ I. BARRES LATÉRALES ═══════════════════════════════════════
 
-$red: #AF3029;
-$orange: #BC5215;
-$yellow: #AD8301;
-$green: #66800B;
-$cyan: #24837B;
-$blue: #205EA6;
-$purple: #5E409D;
-$magenta: #A02F6F;
-
-/* Sidebar top margins */
 .left.sidebar,
 .right.sidebar {
   margin-top: 2.4rem !important;
 }
 
-/* Top of note area */
-.breadcrumb-container {
-  font-size: 0.9em;
-
-  & a {
-    color: var(--darkgray);
-    font-style: italic;
-  }
+.explorer {
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 5px;
+  padding: 10px;
+  font-size: 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
 }
 
-.article-title {
-  margin-top: 1.2rem;
-  margin-bottom: 0.5rem;
+[saved-theme="dark"] .explorer {
+  background: rgba(40, 40, 40, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.05);
 }
-
-.content-meta {
-  color: var(--gray);
-  font-size: 0.9rem;
-  margin-bottom: 0.5rem;
-}
-
-.tags {
-  font-size: 0.8em;
-  margin-top: 0 !important;
-}
-
-a.tag-link {
-  color: var(--darkgray);
-  background-color: var(--lightgray) !important;
-}
-
-/* Explorer */
 
 .folder-outer {
   font-size: 0.9rem;
@@ -203,7 +354,52 @@ a.tag-link {
   }
 }
 
-/* Recent notes */
+button#explorer .fold {
+  opacity: 0.8;
+  transition: transform 0.3s;
+}
+
+li:has(> .folder-outer:not(.open)) > .folder-container > svg {
+  transform: rotate(90deg) !important;
+}
+
+.search {
+  max-width: unset;
+  position: relative;
+  border-radius: 25px;
+  overflow: hidden;
+}
+
+.search > #search-icon {
+  background-color: unset !important;
+  border: 1px solid var(--gray) !important;
+}
+
+.search input {
+  border-radius: 25px;
+  padding: 12px 20px 12px 45px;
+  border: none;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+}
+
+.search input:focus {
+  background: rgba(255, 255, 255, 0.2);
+  box-shadow: 0 0 20px rgba(139, 126, 200, 0.3);
+}
+
+[saved-theme="dark"] .search input {
+  background: rgba(40, 40, 40, 0.8);
+  color: var(--dark);
+}
+
+// Indentation de la table des matières, en propriétés logiques
+#toc-content {
+  .depth-1 { padding: 0 !important; padding-inline-start: 1rem !important; }
+  .depth-2 { padding: 0 !important; padding-inline-start: 2rem !important; }
+  .depth-3 { padding: 0 !important; padding-inline-start: 3rem !important; }
+}
 
 .recent-notes {
   & .recent-ul {
@@ -223,50 +419,75 @@ a.tag-link {
   }
 }
 
-/* Others */
-.page {
-  article {
-    > h1 {
-      border-bottom: 1px solid var(--lightgray);
-      padding-bottom: 0.3em;
-    }
-	  
-    > h1 {
-      font-size: 36px !important;
-      color: $red;
-    }
-
-    > h2 {
-      font-size: 30px !important;
-      color: $orange;
-    }
-
-    > h3 {
-      font-size: 24px !important;
-      color: $yellow;
-    }
-
-    > h4 {
-      font-size: 20px !important;
-      color: $green;
-    }
-
-    > h5 {
-      font-size: 18px !important;
-      color: $cyan;
-    }
-
-    > h6 {
-      font-size: 16px !important;
-      color: $purple;
-    }
+// Barres latérales collantes + filet vertical
+@media (min-width: $desktopBreakpoint) {
+  .page > #quartz-body .sidebar {
+    align-self: start; // sans quoi l'item de grille s'étire et sticky ne prend pas
+    position: sticky;
+    top: 2rem;
+    height: auto;
+    max-height: calc(100vh - 2rem);
+    overflow-y: auto;
+    overscroll-behavior: contain;
   }
 
-  .page-header {
-    @media all and (max-width: $fullPageWidth) {
-      margin-top: 1rem;
-    }
+  .sidebar.left {
+    border-inline-end: 1px dashed #e5e5e5;
+    padding-inline-end: 3rem !important;
   }
+
+  .sidebar.left > .search {
+    width: 100%;
+  }
+}
+
+[saved-theme="dark"] .sidebar.left {
+  border-inline-end: 1px dashed rgba(255, 255, 255, 0.1);
+}
+
+// ═══ J. EN-TÊTE D'ARTICLE ══════════════════════════════════════
+
+.breadcrumb-container {
+  font-size: 0.9em;
+
+  & a {
+    color: var(--darkgray);
+    font-style: italic;
+  }
+}
+
+.breadcrumb-element p {
+  margin: 0 0.5rem 0 0;
+  padding: 0;
+  line-height: normal;
+}
+
+.article-title {
+  margin-top: 1.2rem;
+  margin-bottom: 0.5rem;
+}
+
+.content-meta {
+  color: var(--gray);
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+
+  &[show-comma="true"] > *:not(:last-child)::after {
+    content: " • ";
+    color: var(--gray);
+    margin: 0 0.5rem;
+  }
+}
+
+.tags {
+  font-size: 0.8em;
+  margin-top: 0 !important;
+  padding-inline: 0 !important;
+}
+
+a.tag-link {
+  color: var(--darkgray);
+  background-color: var(--lightgray) !important;
 }
 
 .page-title {
@@ -277,25 +498,101 @@ a.tag-link {
   }
 }
 
-li {
-  direction: ltr !important;
-  text-align: left !important;
+.page .page-header {
+  @media all and (max-width: $fullPageWidth) {
+    margin-top: 1rem;
+  }
+}
+
+// ═══ K. DIVERS ═════════════════════════════════════════════════
+
+pre {
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  position: relative;
+}
+
+.center img {
+  display: block !important;
+  margin-inline: auto !important;
+}
+
+.table-container > table {
+  margin: auto;
+}
+
+th {
+  text-align: center !important;
+}
+
+footer {
+  text-align: center;
+  padding: 2rem 0;
+
+  ul {
+    display: unset;
+  }
+}
+
+// KaTeX et Mermaid restent LTR quoi qu'il arrive
+.katex,
+.katex-display {
+  direction: ltr;
+}
+
+.katex {
+  display: inline-block;
+}
+
+.mermaid {
+  text-align: center;
+}
+
+pre:has(> code.mermaid) {
+  background-color: transparent;
+
+  .clipboard-button {
+    display: none;
+  }
+}
+
+.nodeLabel,
+.edgeLabel {
+  font-family: var(--bodyFont);
+}
+
+// Scrollbar façon macOS (WebKit uniquement)
+body::-webkit-scrollbar {
+  background-color: #fff;
+  width: 16px;
+}
+
+body::-webkit-scrollbar-track {
+  background-color: #fff;
+}
+
+body::-webkit-scrollbar-thumb {
+  background-color: #babac0;
+  border-radius: 16px;
+  border: 4px solid #fff;
+}
+
+body::-webkit-scrollbar-button {
+  display: none;
 }
 
 /* ============================================
-   FEATURED CARDS STYLES
-   Cards with blur effect on hover
+   L. FEATURED CARDS — tes styles, inchangés
    ============================================ */
 
-/* Title for featured section */
 .featured-cards-title {
-  text-align: center; /* Change to 'right' for RTL languages */
+  text-align: center;
   margin-bottom: 1.5rem;
   font-size: 1.75rem;
   color: var(--dark);
 }
 
-/* Grid container for cards */
 .card-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -303,39 +600,34 @@ li {
   margin: 2rem 0;
 }
 
-/* Individual card container */
 .card-container {
   display: block;
   position: relative;
   padding: 1.5rem;
   border-radius: 8px;
-  background-color: var(--darkgray); /* Fallback color */
+  background-color: var(--darkgray);
   overflow: hidden;
   text-decoration: none;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   min-height: 150px;
   z-index: 0;
-  
-  /* Glassmorphism effect */
+
   backdrop-filter: blur(10px);
   background: rgba(255, 255, 255, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.2);
   box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+
+  animation: fadeInUp 0.6s ease-out;
 }
 
-/* Card hover effect - lift and shadow */
 .card-container:hover {
   transform: translateY(-8px) scale(1.02);
   box-shadow: 0 16px 48px rgba(0, 0, 0, 0.2);
 }
 
-/* Background image layer */
 .card-bg {
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  inset: 0;
   background-image: var(--card-bg);
   background-size: cover;
   background-position: center;
@@ -343,48 +635,41 @@ li {
   z-index: 1;
 }
 
-/* BLURRED state (default) - for cards with images */
 .card-container.has-image .card-bg {
   filter: blur(8px) brightness(0.5);
   transform: scale(1.1);
 }
 
-/* UNBLURRED state (on hover) - for cards with images */
 .card-container.has-image:hover .card-bg {
   filter: blur(0px) brightness(0.8);
   transform: scale(1);
 }
 
-/* Fallback gradient for cards without images */
 .card-container.no-image .card-bg {
-  background: linear-gradient(135deg, #8B5CF6 0%, #6366F1 50%, #3B82F6 100%);
+  background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 50%, #3b82f6 100%);
 }
 
-/* Content layer (text) */
 .card-content {
   position: relative;
   z-index: 2;
 }
 
-/* Card title styling */
 .card-content h3 {
   margin: 0 0 0.5rem 0;
-  color: #FFFFFF !important; /* Always white for contrast */
+  color: #ffffff !important;
   font-size: 1.25rem;
   font-weight: 700;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
-/* Card description styling */
 .card-content p {
   margin: 0;
-  color: #E5E7EB !important; /* Light gray */
+  color: #e5e7eb !important;
   font-size: 0.9rem;
   line-height: 1.4;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
-/* Dark mode adjustments */
 .dark .card-container {
   background: rgba(30, 30, 30, 0.8);
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -398,23 +683,21 @@ li {
   filter: blur(0px) brightness(0.6);
 }
 
-/* Responsive adjustments */
 @media (max-width: 768px) {
   .card-grid {
     grid-template-columns: 1fr;
     gap: 1rem;
   }
-  
+
   .card-container {
     min-height: 120px;
   }
-  
+
   .featured-cards-title {
     font-size: 1.5rem;
   }
 }
 
-/* Optional: Animation for cards appearing */
 @keyframes fadeInUp {
   from {
     opacity: 0;
@@ -426,14 +709,29 @@ li {
   }
 }
 
-.card-container {
-  animation: fadeInUp 0.6s ease-out;
-}
-
-/* Stagger animation for multiple cards */
 .card-grid .card-container:nth-child(1) { animation-delay: 0.1s; }
 .card-grid .card-container:nth-child(2) { animation-delay: 0.2s; }
 .card-grid .card-container:nth-child(3) { animation-delay: 0.3s; }
 .card-grid .card-container:nth-child(4) { animation-delay: 0.4s; }
 .card-grid .card-container:nth-child(5) { animation-delay: 0.5s; }
 .card-grid .card-container:nth-child(6) { animation-delay: 0.6s; }
+
+// ═══════════════════════════════════════════════════════════════
+//  SUPPRIMÉ de ton ancien fichier, et pourquoi :
+//
+//  · h2#footnote-label::after { content: "پانوشت‌ها" }
+//      affichait « notes de bas de page » en persan sur ton site.
+//  · li { direction: ltr !important; text-align: left !important }
+//      annulait le unicode-bidi:plaintext sur toutes tes listes :
+//      une liste en arabe serait restée alignée à gauche.
+//  · p[dir="rtl"] et p[dir="ltr"]
+//      ne matchent jamais : l'attribut dir n'est posé que par le
+//      plugin bidi-text, que tu n'as pas installé. Code mort.
+//      Les polices arabes passent de toute façon par unicode-range.
+//  · div { direction: ltr !important }
+//      forçait la direction sur tous les div de la page.
+//  · #explorer-content ul { padding-right }, .folder-icon
+//    { margin-left }, .content-meta { margin-left },
+//    div.search.mobile-only { padding-right }
+//      décalages calculés pour une interface persane, à l'envers ici.
+// ═══════════════════════════════════════════════════════════════
