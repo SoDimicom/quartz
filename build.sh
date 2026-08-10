@@ -18,6 +18,8 @@ rm -rf temp-repo
 echo "✅ Content extracted successfully from notes branch"
 
 echo "🔨 Building Quartz..."
+npm install
+npx quartz plugin install
 npx quartz build
 
 echo "✅ Build completed!"
