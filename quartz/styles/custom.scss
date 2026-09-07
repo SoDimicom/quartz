@@ -2,24 +2,17 @@
 @use "./base.scss";
 @use "./variables.scss" as *;
 
-// ═══════════════════════════════════════════════════════════════
-//  FUSION
-//  · Ton système de polices, ton échelle de titres Flexoki et tes
-//    featured cards : conservés à l'identique.
-//  · Couche visuelle reprise de blog.eledah.ir (MIT) : fond texturé,
-//    contenu en carte, verre dépoli, barres latérales collantes.
-//  · Restes RTL persans de ton fichier : supprimés (voir notes en bas).
-// ═══════════════════════════════════════════════════════════════
+// Adaptation de eledah/quartz (branche v5).
+// La structure visuelle reste celle de la démo https://eledah.ir/quartz/ :
+// grille Quartz sobre, fonds plats et composants natifs. Seule la logique
+// typographique propre à ce site est conservée ci-dessous.
 
 $mobileBreakpoint: map.get($breakpoints, mobile);
-$desktopBreakpoint: map.get($breakpoints, desktop);
-$fullPageWidth: $desktopBreakpoint;
+$fullPageWidth: map.get($breakpoints, desktop);
 
-// ═══ A. TES POLICES — inchangées ═══════════════════════════════
-// `unicode-range` répartit la charge par plage Unicode : le navigateur
-// ne télécharge Amiri que s'il rencontre effectivement de l'arabe.
+// ═══ POLICES DU SITE — ne pas remplacer par Vazirmatn ═════════
 
-/* Carena — latin (titres) */
+/* Carena — latin, réservée aux titres concernés */
 @font-face {
   font-family: "Carena";
   src: url("https://fonts.cdnfonts.com/s/85090/Carena-Regular.woff") format("woff");
@@ -46,13 +39,6 @@ body {
   font-family: $font-body;
 }
 
-// Carena réservée aux h2/h3. base.scss pose déjà
-// `h1,h2,h3,h4,h5,h6 { font-family: var(--headerFont) }` — même
-// spécificité (0,0,1), donc c'est l'ordre de @use qui départage :
-// `@use "./base.scss"` est chargé avant ces règles, on gagne au
-// cascade normal. Le article > & ci-dessous verrouille quand même
-// avec une spécificité supérieure, au cas où un thème/plugin
-// réinjecte la règle de base plus tard dans la feuille compilée.
 article h2,
 article h3,
 h2,
@@ -60,8 +46,6 @@ h3 {
   font-family: $font-header !important;
 }
 
-// h1, h4-h6 : explicitement sur --headerFont (system-ui, cf.
-// quartz.config.yaml) plutôt que de laisser une valeur ambiguë.
 h1,
 h4,
 h5,
@@ -75,14 +59,19 @@ code {
   font-size: 0.9em;
 }
 
-// ═══ B. DIRECTION AUTOMATIQUE DU TEXTE ═════════════════════════
+// ═══ TEXTE MULTILINGUE ════════════════════════════════════════
 
 article p,
 article li,
-article h1, article h2, article h3,
-article h4, article h5, article h6,
+article h1,
+article h2,
+article h3,
+article h4,
+article h5,
+article h6,
 article blockquote,
-article td, article th {
+article td,
+article th {
   unicode-bidi: plaintext;
   text-align: start;
 }
@@ -92,7 +81,6 @@ p {
   margin-bottom: 1.2em;
 }
 
-// Citation coranique ou hadith mis en avant
 .ayah {
   font-family: "Amiri Quran Colored", "Amiri", serif;
   font-size: 1.375rem;
@@ -106,109 +94,14 @@ p {
   font-size: 0.95rem;
 }
 
-// ═══ C. FOND TEXTURÉ ═══════════════════════════════════════════
-// Bruit fractal en SVG inline, aucun fichier à héberger.
-// `absolute` et non `fixed` : en fixed la texture se colle au viewport
-// et le contenu glisse dessous au scroll sur mobile.
-
-$noise-texture: url("data:image/svg+xml,%3Csvg viewBox='0 0 250 250' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-
-body {
-  background-color: #f9f7f2;
-  min-height: 100vh;
-  position: relative;
-  width: 100%;
-  max-width: 100%;
-}
-
-body::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  min-height: 100%;
-  background-image: $noise-texture;
-  background-repeat: repeat;
-  opacity: 0.04;
-  pointer-events: none;
-  z-index: -1;
-}
-
-[saved-theme="dark"] body {
-  background-color: var(--light);
-}
-
-// ═══ D. CORRECTIFS DE DÉBORDEMENT ══════════════════════════════
-// base.scss pose html { width: 100vw }, qui inclut la scrollbar et
-// déborde sur mobile ; et overflow:hidden sur html/body neutralise
-// position:sticky sur les barres latérales.
-
-*, *::before, *::after {
-  box-sizing: border-box;
-}
-
-html {
-  width: 100%;
-  max-width: 100%;
-  overflow-x: clip;
-}
-
-// ═══ E. CONTENU EN CARTE ═══════════════════════════════════════
-
-.center {
-  background-color: #ffffff;
-  border-radius: 24px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-  padding: 32px !important;
-  margin-top: 2rem !important;
-  width: 100%;
-  max-width: 100%;
-}
-
-[saved-theme="dark"] .center {
-  background-color: var(--lightgray);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-}
-
-@media (max-width: $mobileBreakpoint) {
-  html, body {
-    overflow-x: clip;
-  }
-
-  .page {
-    width: 100%;
-    max-width: 100%;
-    overflow-x: hidden;
-  }
-
-  .page > #quartz-body {
-    width: 100%;
-    max-width: 100%;
-    min-width: 0;
-  }
-
-  .page > #quartz-body .center,
-  .page > #quartz-body footer {
-    min-width: 0;
-    width: 100%;
-  }
-
-  .center {
-    padding: 20px !important;
-    border-radius: 16px;
-    margin-top: 1rem !important;
-  }
-}
-
-// ═══ F. TON ÉCHELLE DE TITRES (Flexoki) — inchangée ════════════
+// ═══ HIÉRARCHIE ÉDITORIALE EXISTANTE ═════════════════════════
 
 $red: #af3029;
 $orange: #bc5215;
 $yellow: #ad8301;
 $green: #66800b;
 $cyan: #24837b;
-$blue: #205ea6;
 $purple: #5e409d;
-$magenta: #a02f6f;
 
 .page article {
   > h1 {
@@ -218,19 +111,42 @@ $magenta: #a02f6f;
     color: $red;
   }
 
-  > h2 { font-size: 30px !important; color: $orange; }
-  > h3 { font-size: 24px !important; color: $yellow; }
-  > h4 { font-size: 20px !important; color: $green; }
-  > h5 { font-size: 18px !important; color: $cyan; }
-  > h6 { font-size: 16px !important; color: $purple; }
+  > h2 {
+    font-size: 30px !important;
+    color: $orange;
+  }
+
+  > h3 {
+    font-size: 24px !important;
+    color: $yellow;
+  }
+
+  > h4 {
+    font-size: 20px !important;
+    color: $green;
+  }
+
+  > h5 {
+    font-size: 18px !important;
+    color: $cyan;
+  }
+
+  > h6 {
+    font-size: 16px !important;
+    color: $purple;
+  }
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   letter-spacing: -0.02em;
   line-height: 1.2;
 }
 
-// Les appels de note gonflent la hauteur de ligne du paragraphe
 sup {
   line-height: 0;
   vertical-align: super;
@@ -243,233 +159,12 @@ sup {
   }
 }
 
-// ═══ G. LIENS ══════════════════════════════════════════════════
-// inset-inline-start plutôt que left : le trait part du bon côté
-// que le bloc soit rendu en LTR ou en RTL.
-
-a {
-  position: relative;
-  transition: color 0.3s ease;
-}
-
-a::after {
-  content: "";
-  position: absolute;
-  bottom: -2px;
-  inset-inline-start: 0;
-  width: 0;
-  height: 2px;
-  background: var(--secondary);
-  transition: width 0.3s ease;
-}
-
-a:hover::after {
-  width: 100%;
-}
-
-a.internal {
-  background-color: transparent !important;
-  padding: 0 !important;
-  color: var(--secondary);
-  font-weight: 500;
-  transition: all 0.3s ease;
-}
-
-a.internal::after {
-  height: 3px;
-  background: var(--tertiary);
-  border-radius: 2px;
-}
-
-a.internal:hover {
-  color: var(--tertiary);
-}
-
-// Les cartes ne doivent pas hériter du soulignement animé
-.card-container::after {
-  content: none !important;
-}
-
-.text-highlight {
-  font-weight: normal;
-  background-color: transparent;
-  padding: 1px 5px;
-  border-radius: 5px;
-  background-position: 0 100%;
-  background-repeat: no-repeat;
-  background-size: 100% 3px;
-  background-image: linear-gradient(120deg, var(--secondary), var(--secondary));
-  transition: background 200ms ease;
-}
-
-.text-highlight:hover {
-  background-size: 100% 100%;
-}
-
-// ═══ H. CITATIONS ══════════════════════════════════════════════
-// border-inline-start : la barre se met à droite si le bloc est arabe,
-// à gauche sinon. Ton ancienne règle border-right la mettait toujours
-// à droite, y compris sur les citations françaises.
-
-blockquote:not(.callout) {
-  position: relative;
-  margin: 1rem 0;
-  padding-inline: 1rem 0;
-  border: none;
-  border-inline-start: 3px solid var(--secondary);
-  transition: border-color 0.2s;
-}
-
-blockquote footer {
-  display: block;
-  margin-top: 0.75em;
-  font-size: 0.85rem;
-  font-style: normal;
-  color: var(--darkgray);
-
-  &::before {
-    content: "— ";
-  }
-}
-
-blockquote.callout {
-  width: auto;
-  max-width: 100%;
-  margin: 1rem 0;
-  padding: 0 1rem;
-  border-radius: 5px;
-}
-
-.callout.is-collapsed > .callout-title > .fold-callout-icon {
-  transform: rotate(90deg);
-}
-
-// ═══ I. BARRES LATÉRALES ═══════════════════════════════════════
-
-.left.sidebar,
-.right.sidebar {
-  margin-top: 2.4rem !important;
-}
-
-.explorer {
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 5px;
-  padding: 10px;
-  font-size: 1rem;
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(10px);
-}
-
-[saved-theme="dark"] .explorer {
-  background: rgba(40, 40, 40, 0.5);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-.folder-outer {
-  font-size: 0.9rem;
-
-  & li {
-    margin: 0.4em 0;
-  }
-}
-
-button#explorer .fold {
-  opacity: 0.8;
-  transition: transform 0.3s;
-}
-
-li:has(> .folder-outer:not(.open)) > .folder-container > svg {
-  transform: rotate(90deg) !important;
-}
-
-.search {
-  max-width: unset;
-  position: relative;
-  border-radius: 25px;
-  overflow: hidden;
-}
-
-.search > #search-icon {
-  background-color: unset !important;
-  border: 1px solid var(--gray) !important;
-}
-
-.search input {
-  border-radius: 25px;
-  padding: 12px 20px 12px 45px;
-  border: none;
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-  transition: all 0.3s ease;
-}
-
-.search input:focus {
-  background: rgba(255, 255, 255, 0.2);
-  box-shadow: 0 0 20px rgba(139, 126, 200, 0.3);
-}
-
-[saved-theme="dark"] .search input {
-  background: rgba(40, 40, 40, 0.8);
-  color: var(--dark);
-}
-
-// Indentation de la table des matières, en propriétés logiques
-#toc-content {
-  .depth-1 { padding: 0 !important; padding-inline-start: 1rem !important; }
-  .depth-2 { padding: 0 !important; padding-inline-start: 2rem !important; }
-  .depth-3 { padding: 0 !important; padding-inline-start: 3rem !important; }
-}
-
-.recent-notes {
-  & .recent-ul {
-    font-size: 0.85rem;
-
-    & h3 {
-      font-size: 20px;
-    }
-  }
-
-  & > ul.recent-ul > li {
-    margin: 0;
-  }
-
-  & .tag-link {
-    display: none;
-  }
-}
-
-// Barres latérales collantes + filet vertical
-@media (min-width: $desktopBreakpoint) {
-  .page > #quartz-body .sidebar {
-    align-self: start; // sans quoi l'item de grille s'étire et sticky ne prend pas
-    position: sticky;
-    top: 2rem;
-    height: auto;
-    max-height: calc(100vh - 2rem);
-    overflow-y: auto;
-    overscroll-behavior: contain;
-  }
-
-  .sidebar.left {
-    border-inline-end: 1px dashed #e5e5e5;
-    padding-inline-end: 3rem !important;
-  }
-
-  .sidebar.left > .search {
-    width: 100%;
-  }
-}
-
-[saved-theme="dark"] .sidebar.left {
-  border-inline-end: 1px dashed rgba(255, 255, 255, 0.1);
-}
-
-// ═══ J. EN-TÊTE D'ARTICLE ══════════════════════════════════════
+// ═══ COMPOSANTS QUARTZ ════════════════════════════════════════
 
 .breadcrumb-container {
   font-size: 0.9em;
 
-  & a {
+  a {
     color: var(--darkgray);
     font-style: italic;
   }
@@ -523,13 +218,87 @@ a.tag-link {
   }
 }
 
-// ═══ K. DIVERS ═════════════════════════════════════════════════
+.folder-outer {
+  font-size: 0.9rem;
 
-pre {
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-  position: relative;
+  li {
+    margin: 0.4em 0;
+  }
+}
+
+button#explorer .fold {
+  opacity: 0.8;
+  transition: transform 0.3s;
+}
+
+li:has(> .folder-outer:not(.open)) > .folder-container > svg {
+  transform: rotate(90deg) !important;
+}
+
+#toc-content {
+  .depth-1 {
+    padding: 0 !important;
+    padding-inline-start: 1rem !important;
+  }
+
+  .depth-2 {
+    padding: 0 !important;
+    padding-inline-start: 2rem !important;
+  }
+
+  .depth-3 {
+    padding: 0 !important;
+    padding-inline-start: 3rem !important;
+  }
+}
+
+.recent-notes {
+  .recent-ul {
+    font-size: 0.85rem;
+
+    h3 {
+      font-size: 20px;
+    }
+  }
+
+  > ul.recent-ul > li {
+    margin: 0;
+  }
+
+  .tag-link {
+    display: none;
+  }
+}
+
+blockquote:not(.callout) {
+  margin: 1rem 0;
+  padding-inline: 1rem 0;
+  border: none;
+  border-inline-start: 3px solid var(--secondary);
+  transition: border-color 0.2s;
+}
+
+blockquote footer {
+  display: block;
+  margin-top: 0.75em;
+  font-size: 0.85rem;
+  font-style: normal;
+  color: var(--darkgray);
+
+  &::before {
+    content: "— ";
+  }
+}
+
+blockquote.callout {
+  width: auto;
+  max-width: 100%;
+  margin: 1rem 0;
+  padding: 0 1rem;
+}
+
+.callout.is-collapsed > .callout-title > .fold-callout-icon {
+  transform: rotate(90deg);
 }
 
 .center img {
@@ -554,7 +323,6 @@ footer {
   }
 }
 
-// KaTeX et Mermaid restent LTR quoi qu'il arrive
 .katex,
 .katex-display {
   direction: ltr;
@@ -581,29 +349,7 @@ pre:has(> code.mermaid) {
   font-family: var(--bodyFont);
 }
 
-// Scrollbar façon macOS (WebKit uniquement)
-body::-webkit-scrollbar {
-  background-color: #fff;
-  width: 16px;
-}
-
-body::-webkit-scrollbar-track {
-  background-color: #fff;
-}
-
-body::-webkit-scrollbar-thumb {
-  background-color: #babac0;
-  border-radius: 16px;
-  border: 4px solid #fff;
-}
-
-body::-webkit-scrollbar-button {
-  display: none;
-}
-
-/* ============================================
-   L. FEATURED CARDS — tes styles, inchangés
-   ============================================ */
+// ═══ FEATURED CARDS — composant de contenu conservé ═══════════
 
 .featured-cards-title {
   text-align: center;
@@ -622,26 +368,28 @@ body::-webkit-scrollbar-button {
 .card-container {
   display: block;
   position: relative;
-  padding: 1.5rem;
-  border-radius: 8px;
-  background-color: var(--darkgray);
-  overflow: hidden;
-  text-decoration: none;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
   min-height: 150px;
+  padding: 1.5rem;
+  overflow: hidden;
+  border: 1px solid var(--lightgray);
+  border-radius: 8px;
+  background: var(--lightgray);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.08);
+  text-decoration: none;
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
   z-index: 0;
+  animation: fadeInUp 0.6s ease-out both;
+}
 
-  backdrop-filter: blur(10px);
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
-
-  animation: fadeInUp 0.6s ease-out;
+.card-container::after {
+  content: none !important;
 }
 
 .card-container:hover {
-  transform: translateY(-8px) scale(1.02);
-  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.2);
+  transform: translateY(-6px);
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.16);
 }
 
 .card-bg {
@@ -650,7 +398,9 @@ body::-webkit-scrollbar-button {
   background-image: var(--card-bg);
   background-size: cover;
   background-position: center;
-  transition: all 0.4s ease;
+  transition:
+    filter 0.4s ease,
+    transform 0.4s ease;
   z-index: 1;
 }
 
@@ -660,7 +410,7 @@ body::-webkit-scrollbar-button {
 }
 
 .card-container.has-image:hover .card-bg {
-  filter: blur(0px) brightness(0.8);
+  filter: blur(0) brightness(0.8);
   transform: scale(1);
 }
 
@@ -674,8 +424,8 @@ body::-webkit-scrollbar-button {
 }
 
 .card-content h3 {
-  margin: 0 0 0.5rem 0;
-  color: #ffffff !important;
+  margin: 0 0 0.5rem;
+  color: #fff !important;
   font-size: 1.25rem;
   font-weight: 700;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
@@ -689,20 +439,15 @@ body::-webkit-scrollbar-button {
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
-.dark .card-container {
-  background: rgba(30, 30, 30, 0.8);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.dark .card-container.has-image .card-bg {
+:root[saved-theme="dark"] .card-container.has-image .card-bg {
   filter: blur(8px) brightness(0.4);
 }
 
-.dark .card-container.has-image:hover .card-bg {
-  filter: blur(0px) brightness(0.6);
+:root[saved-theme="dark"] .card-container.has-image:hover .card-bg {
+  filter: blur(0) brightness(0.6);
 }
 
-@media (max-width: 768px) {
+@media (max-width: $mobileBreakpoint) {
   .card-grid {
     grid-template-columns: 1fr;
     gap: 1rem;
@@ -722,35 +467,43 @@ body::-webkit-scrollbar-button {
     opacity: 0;
     transform: translateY(20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
   }
 }
 
-.card-grid .card-container:nth-child(1) { animation-delay: 0.1s; }
-.card-grid .card-container:nth-child(2) { animation-delay: 0.2s; }
-.card-grid .card-container:nth-child(3) { animation-delay: 0.3s; }
-.card-grid .card-container:nth-child(4) { animation-delay: 0.4s; }
-.card-grid .card-container:nth-child(5) { animation-delay: 0.5s; }
-.card-grid .card-container:nth-child(6) { animation-delay: 0.6s; }
+.card-grid .card-container:nth-child(1) {
+  animation-delay: 0.1s;
+}
 
-// ═══════════════════════════════════════════════════════════════
-//  SUPPRIMÉ de ton ancien fichier, et pourquoi :
-//
-//  · h2#footnote-label::after { content: "پانوشت‌ها" }
-//      affichait « notes de bas de page » en persan sur ton site.
-//  · li { direction: ltr !important; text-align: left !important }
-//      annulait le unicode-bidi:plaintext sur toutes tes listes :
-//      une liste en arabe serait restée alignée à gauche.
-//  · p[dir="rtl"] et p[dir="ltr"]
-//      ne matchent jamais : l'attribut dir n'est posé que par le
-//      plugin bidi-text, que tu n'as pas installé. Code mort.
-//      Les polices arabes passent de toute façon par unicode-range.
-//  · div { direction: ltr !important }
-//      forçait la direction sur tous les div de la page.
-//  · #explorer-content ul { padding-right }, .folder-icon
-//    { margin-left }, .content-meta { margin-left },
-//    div.search.mobile-only { padding-right }
-//      décalages calculés pour une interface persane, à l'envers ici.
-// ═══════════════════════════════════════════════════════════════
+.card-grid .card-container:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.card-grid .card-container:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+.card-grid .card-container:nth-child(4) {
+  animation-delay: 0.4s;
+}
+
+.card-grid .card-container:nth-child(5) {
+  animation-delay: 0.5s;
+}
+
+.card-grid .card-container:nth-child(6) {
+  animation-delay: 0.6s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
