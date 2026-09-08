@@ -35,8 +35,32 @@ $fullPageWidth: map.get($breakpoints, desktop);
 $font-body: "Amiri Quran Colored", "Noto Serif", serif;
 $font-header: "Carena", "Amiri Quran Colored", serif;
 
+/*
+ * Les feuilles de quartz-themes sont chargées après custom.scss et utilisent
+ * les variables Obsidian ci-dessous avec des sélecteurs plus spécifiques.
+ * Les verrouiller ici préserve la typographie historique tout en laissant le
+ * thème piloter uniquement la palette et les détails visuels.
+ */
+:root {
+  --bodyFont: #{$font-body} !important;
+  --font-text: #{$font-body} !important;
+  --font-interface: #{$font-body} !important;
+
+  --headerFont: system-ui, "Segoe UI", sans-serif !important;
+  --titleFont: var(--headerFont) !important;
+  --h1-font: var(--headerFont) !important;
+  --h2-font: #{$font-header} !important;
+  --h3-font: #{$font-header} !important;
+  --h4-font: var(--headerFont) !important;
+  --h5-font: var(--headerFont) !important;
+  --h6-font: var(--headerFont) !important;
+
+  --codeFont: "IBM Plex Mono", "Fira Code", monospace !important;
+  --font-monospace: var(--codeFont) !important;
+}
+
 body {
-  font-family: $font-body;
+  font-family: $font-body !important;
 }
 
 article h2,
@@ -55,7 +79,7 @@ h6 {
 
 code {
   direction: ltr !important;
-  font-family: "IBM Plex Mono", "Fira Code", monospace;
+  font-family: "IBM Plex Mono", "Fira Code", monospace !important;
   font-size: 0.9em;
 }
 
