@@ -106,10 +106,12 @@ plugins:
   - source: "@quartz-community/quartz-fonts"
     enabled: true
   - source: "@quartz-themes/core"
-    enabled: false
+    enabled: true
     options:
-      theme: tokyo-night
+      theme: vanilla-palettes.catppuccin-mocha
       mode: both
+      # Conserver les polices personnalisées définies dans custom.scss.
+      themeFonts: false
   - source: "@quartz-community/remove-draft"
     enabled: true
   - source: "@quartz-community/explicit-publish"
