@@ -16,13 +16,8 @@ configuration:
     fontOrigin: googleFonts
     cdnCaching: true
     typography:
-      # Header/body sur une police système : Quartz posera
-      # --headerFont/--bodyFont mais custom.scss les écrase avec les
-      # vrais @font-face (Carena + Amiri Quran Colored, unicode-range).
-      # Ne PAS remettre "Carena" ou "Amiri Quran Colored" ici : elles
-      # n'existent pas sur Google Fonts, Quartz échouerait à les charger.
-      header: system-ui
-      body: system-ui
+      header: Schibsted Grotesk
+      body: Source Sans Pro
       code: IBM Plex Mono
     colors:
       lightMode:
@@ -106,12 +101,10 @@ plugins:
   - source: "@quartz-community/quartz-fonts"
     enabled: true
   - source: "@quartz-themes/core"
-    enabled: true
+    enabled: false
     options:
-      theme: vanilla-palettes.catppuccin-mocha
+      theme: tokyo-night
       mode: both
-      # Conserver les polices personnalisées définies dans custom.scss.
-      themeFonts: false
   - source: "@quartz-community/remove-draft"
     enabled: true
   - source: "@quartz-community/explicit-publish"
