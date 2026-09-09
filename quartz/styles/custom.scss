@@ -36,7 +36,6 @@ $font-interface:
   Roboto,
   Inter,
   sans-serif;
-$font-heading: "Amiri Quran Colored", "Schibsted Grotesk", sans-serif;
 $font-carena: "Amiri Quran Colored", "Carena", "Schibsted Grotesk", sans-serif;
 $font-code: "Amiri Quran Colored", "IBM Plex Mono", monospace;
 
@@ -48,14 +47,14 @@ $font-code: "Amiri Quran Colored", "IBM Plex Mono", monospace;
   --font-text: #{$font-body} !important;
   --font-interface: #{$font-interface} !important;
 
-  --titleFont: #{$font-heading} !important;
-  --headerFont: #{$font-heading} !important;
-  --h1-font: #{$font-heading} !important;
+  --titleFont: #{$font-carena} !important;
+  --headerFont: #{$font-carena} !important;
+  --h1-font: #{$font-carena} !important;
   --h2-font: #{$font-carena} !important;
   --h3-font: #{$font-carena} !important;
-  --h4-font: #{$font-heading} !important;
-  --h5-font: #{$font-heading} !important;
-  --h6-font: #{$font-heading} !important;
+  --h4-font: #{$font-carena} !important;
+  --h5-font: #{$font-carena} !important;
+  --h6-font: #{$font-carena} !important;
 
   --codeFont: #{$font-code} !important;
   --font-monospace: #{$font-code} !important;
@@ -66,16 +65,12 @@ body {
 }
 
 h1,
+h2,
+h3,
 h4,
 h5,
-h6 {
-  font-family: $font-heading !important;
-}
-
-article h2,
-article h3,
-h2,
-h3 {
+h6,
+thead {
   font-family: $font-carena !important;
 }
 
@@ -99,6 +94,13 @@ article dt {
   text-align: start;
 }
 
+// Le script bidi ajoute cette classe uniquement aux blocs dont le premier
+// caractère directionnel fort est arabe. Le thème Quartz conserve donc son
+// interligne natif pour les blocs latins.
+article .is-rtl-block {
+  line-height: 2.1;
+}
+
 // Les attributs explicites restent prioritaires lorsqu'ils sont présents dans
 // le Markdown ou le HTML intégré.
 article [dir="rtl"],
@@ -116,7 +118,7 @@ article [dir="ltr"] {
 .ayah {
   font-family: "Amiri Quran Colored", "Amiri", serif !important;
   font-size: 1.375rem;
-  line-height: 2.5;
+  line-height: 2.6;
   direction: rtl;
   unicode-bidi: plaintext;
   text-align: right;
